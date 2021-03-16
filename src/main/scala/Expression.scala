@@ -29,7 +29,7 @@ sealed trait RSValue extends RSExpression {
   }
 }
 
-sealed trait RSBoolean extends RSValue
+sealed trait Bool extends RSValue
 
-case object True extends RSBoolean
-case object False extends RSBoolean
+case object True extends Bool
+case object False extends Bool

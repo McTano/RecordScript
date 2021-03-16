@@ -13,3 +13,9 @@ project/plugins/project/
 .history
 .cache
 .lib/
+
+
+.vscode/
+**/**/*.class
+**/**/*.log
+.metals/
