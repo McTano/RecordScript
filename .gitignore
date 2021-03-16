@@ -1,22 +1,46 @@
-#### joe made this: http://goel.io/joe
+# gitignore copied from Alvin Alexander
+# https://alvinalexander.com/source-code/scala/sample-gitignore-file-scala-sbt-intellij-eclipse/
 
-#### sbt ####
-# Simple Build Tool
-# http://www.scala-sbt.org/release/docs/Getting-Started/Directories.html#configuring-version-control
+# bloop and metals
+.bloop
+.bsp
+.metals
 
-dist/*
+# scala 3
+.tasty
+
+# vs code
+.vscode
+
+# sbt
+# (may want to keep parts of 'project')
+bin/
+project/
 target/
-lib_managed/
-src_managed/
-project/boot/
-project/plugins/project/
-.history
-.cache
-.lib/
+build/
 
+# eclipse
+build
+.classpath
+.project
+.settings
+.worksheet
 
-.vscode/
-*.class
+# intellij idea
 *.log
-.bloop/
-.metals/
+*.iml
+*.ipr
+*.iws
+.idea
+
+# mac
+.DS_Store
+
+# other?
+.history
+.scala_dependencies
+.cache
+.cache-main
+
+#general
+*.class
