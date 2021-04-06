@@ -1,4 +1,5 @@
 import scala.util.{Try, Success, Failure}
+import scala.util.parsing.combinator.Parsers
 
 object Parser {
   def parse(str: String): Try[RSExpression] = {

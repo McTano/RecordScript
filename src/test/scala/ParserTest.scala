@@ -24,4 +24,14 @@ class ParserTest extends org.scalatest.funsuite.AnyFunSuite {
       case Failure(_: Throwable)       => assert(false, "Wrong kind of error")
     }
   }
+
+  // test("correct hierarchy of nested conditionals") {
+  //   assert(
+  //     Parser.parse("if true then if true then false else true else true") == If(
+  //       True,
+  //       If(True, False, True),
+  //       True
+  //     )
+  //   )
+  // }
 }
