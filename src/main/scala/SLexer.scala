@@ -8,10 +8,10 @@ object SLexer extends RegexParsers {
   def openParen: Parser[Syntax] = "(" ^^ (_ => OpenParen)
   def closeParen: Parser[Syntax] = ")" ^^ (_ => CloseParen)
   def let: Parser[Keyword] = "let" ^^ (_ => Let)
-  def add: Parser[Operator] = "add" ^^ (_ => Add)
-  def mult: Parser[Operator] = "mult" ^^ (_ => Mult)
+  def plus: Parser[Operator] = "+" ^^ (_ => Plus)
+  def times: Parser[Operator] = "*" ^^ (_ => Star)
 
-  def keyword = (let | add | mult)
+  def keyword = (let | plus | times)
 
   def syntax: Parser[Syntax] = { openParen | closeParen }
 

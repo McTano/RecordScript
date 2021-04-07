@@ -5,7 +5,7 @@ import scala.util.Success
 
 object Solution {
   val binops: Map[Operator, ((Int, Int) => Int)] =
-    Map(Add -> (_ + _), Mult -> (_ * _))
+    Map(Plus -> (_ + _), Star -> (_ * _))
 
   def interpret(expression: String): Int = {
     evaluate(parse(expression), NullContext)
@@ -70,8 +70,8 @@ sealed trait Keyword extends Token
 case object Let extends Keyword
 
 sealed trait Operator extends Token
-case object Add extends Operator
-case object Mult extends Operator
+case object Plus extends Operator
+case object Star extends Operator
 
 sealed trait Context {
   def extend(b: String, v: Int): Context = {
