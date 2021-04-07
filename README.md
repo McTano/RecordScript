@@ -1,7 +1,7 @@
 # Recordscript
 a fun language
 
-## Grammar
+## Boolean expression language Grammar
 
 ```txt
 Bool := true | false

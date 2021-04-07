@@ -2,13 +2,22 @@ import util.matching.Regex
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 import scala.util.Success
+import scala.io.Source
+import java.io.File
 
-object Solution {
+object Lispish {
   val binops: Map[Operator, ((Int, Int) => Int)] =
     Map(Plus -> (_ + _), Star -> (_ * _))
 
-  def interpret(expression: String): Int = {
-    evaluate(parse(expression), NullContext)
+  def interpret(program: String): Int = {
+    evaluate(parse(program), NullContext)
+  }
+
+  def interpretFile(path: String): Int = {
+    val fBuffer = Source.fromFile(new File(path))
+    val program: String = fBuffer.getLines.mkString
+    fBuffer.close
+    interpret(program)
   }
 
   def evaluate(expression: Expression, context: Context): Int = {
