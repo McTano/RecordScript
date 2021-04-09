@@ -1,1 +1,1 @@
-(let x 7 y 13 (+ (let y 30 x 1700 (+ x y)) y))
+(let x 7 y 13 ((let y 30 x 1700 (x + y)) + y))

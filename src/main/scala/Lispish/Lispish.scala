@@ -55,6 +55,7 @@ class SeqReader[T](seq: Seq[T]) extends Reader[T] {
   def atEnd: Boolean = seq.isEmpty
   def pos: Position = NoPosition
   def rest: SeqReader[T] = new SeqReader(seq.tail)
+  override def toString = seq.toString
 }
 
 sealed trait Expression
