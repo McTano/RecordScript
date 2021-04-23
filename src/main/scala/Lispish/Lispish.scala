@@ -20,10 +20,10 @@ object Lispish {
     interpret(program)
   }
 
-  def evaluate(expression: Expression, context: Context): Int = {
+  def evaluate(expression: Expression, context: Context[Int]): Int = {
     expression match {
       case Num(n) => n
-      case Var(v) =>
+      case (v: Var) =>
         context.lookup(v) match {
           case None =>
             throw new RuntimeException(
@@ -35,7 +35,7 @@ object Lispish {
         evaluate(
           targetExpression,
           binders.foldLeft(context)((context, binder) =>
-            context.extend(binder._1.name, evaluate(binder._2, context))
+            context.extend(binder._1, evaluate(binder._2, context))
           )
         )
       case Binop(op, lhs, rhs) =>
@@ -57,14 +57,12 @@ class SeqReader[T](seq: Seq[T]) extends Reader[T] {
   def rest: SeqReader[T] = new SeqReader(seq.tail)
   override def toString = seq.toString
 }
-
 sealed trait Expression
 case class LetExpr(
     binders: List[(Var, Expression)],
     targetExpression: Expression
 ) extends Expression
 case class Binop(o: Operator, e1: Expression, e2: Expression) extends Expression
-case class MultExpr(e1: Expression, e2: Expression) extends Expression
 
 sealed trait Token
 
@@ -79,38 +77,10 @@ case object CloseParen extends Syntax
 sealed trait Keyword extends Token
 case object Let extends Keyword
 
-sealed trait Operator extends Token
-case object Plus extends Operator
-case object Star extends Operator
+sealed case class Operator(symbol: String, signature: Fun) extends Token
+object Plus extends Operator("+", Fun(NumType, NumType, NumType)) {}
+object Star extends Operator("*", Fun(NumType, NumType, NumType)) {}
 
-sealed trait Context {
-  def extend(b: String, v: Int): Context = {
-    new Binding(this, b, v)
-  }
-  def lookup(v: String): Option[Int]
-}
-case object NullContext extends Context {
-  def lookup(v: String): Option[Int] = {
-    None
-  }
-}
-case class Binding(outerContext: Context, variable: String, value: Int)
-    extends Context {
-  def lookup(v: String): Option[Int] = {
-    // println(s"looking up ${v} in context ${this}")
-    if (v == variable) {
-      Some(value)
-    } else {
-      outerContext.lookup(v)
-    }
-  }
-
-  override def toString() = {
-    s"""|{
-            |  $variable = $value,
-            |  outerContext: {
-            |    $outerContext
-            |  }
-            |}""".stripMargin
-  }
+object Main {
+  val t = Plus.signature
 }
