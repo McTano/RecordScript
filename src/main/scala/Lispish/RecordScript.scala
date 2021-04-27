@@ -5,7 +5,7 @@ import scala.util.Success
 import scala.io.Source
 import java.io.File
 
-object Lispish {
+object RecordScript {
   val binops: Map[Operator, ((Int, Int) => Int)] =
     Map(Plus -> (_ + _), Star -> (_ * _))
 
@@ -46,7 +46,7 @@ object Lispish {
   }
 
   def parse(str: String): Expression = {
-    SParsers(SLexer(str))
+    Parse(Tokenize(str))
   }
 }
 
@@ -57,6 +57,7 @@ class SeqReader[T](seq: Seq[T]) extends Reader[T] {
   def rest: SeqReader[T] = new SeqReader(seq.tail)
   override def toString = seq.toString
 }
+
 sealed trait Expression
 case class LetExpr(
     binders: List[(Var, Expression)],
@@ -80,7 +81,3 @@ case object Let extends Keyword
 sealed case class Operator(symbol: String, signature: Fun) extends Token
 object Plus extends Operator("+", Fun(NumType, NumType, NumType)) {}
 object Star extends Operator("*", Fun(NumType, NumType, NumType)) {}
-
-object Main {
-  val t = Plus.signature
-}

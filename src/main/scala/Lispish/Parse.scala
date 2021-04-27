@@ -2,7 +2,7 @@ import util.matching.Regex
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 import scala.util.Success
-object SParsers extends PackratParsers {
+object Parse extends PackratParsers {
   type Elem = Token
   def number: Parser[Num] = {
     accept("number", { case n @ Num(_) => n })
