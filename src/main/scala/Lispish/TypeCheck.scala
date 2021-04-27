@@ -6,9 +6,10 @@ object TypeCheck {
     TypeCheck(program, NullContext)
   }
 
-  def apply(op: Operator): Fun = {
+  def apply(op: Operator): BinopType = {
     op.signature
   }
+
   def apply(
       expression: Expression,
       context: Context[Type]
@@ -16,7 +17,7 @@ object TypeCheck {
     expression match {
       case LetExpr(binders, targetExpression) =>
         Try(
-          binders.foldLeft[(Type, Context[Type])]((Top, context))(
+          binders.foldLeft[(Type, Context[Type])]((TopType, context))(
             (prev: (Type, Context[Type]), current: (Var, Expression)) => {
               current match {
                 case (variable, boundExpr) => {
@@ -28,14 +29,14 @@ object TypeCheck {
             }
           )
         )
-      case Binop(op, e1, e2) =>
+      case BinopExpr(op, e1, e2) =>
         TypeCheck(e1).map(res =>
           res match {
             case (t1, _) =>
               TypeCheck(e2).get match {
                 case (t2, _) =>
                   TypeCheck(op) match {
-                    case Fun(lhsType, rhsType, resType) =>
+                    case BinopType(lhsType, rhsType, resType) =>
                       if (lhsType == t1) {
                         if (rhsType == t2) {
                           (resType, context)
@@ -49,7 +50,8 @@ object TypeCheck {
               }
           }
         )
-      case Num(n) => Success(NumType, context)
+      case NumLiteral(n)    => Success(NumType, context)
+      case (b: BoolLiteral) => Success(BoolType, context)
       case (v: Var) =>
         context.lookup(v) match {
           case Some(t) => Success(t, context)

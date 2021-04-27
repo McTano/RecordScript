@@ -4,25 +4,28 @@ import scala.util.parsing.input._
 import scala.util.Success
 object Parse extends PackratParsers {
   type Elem = Token
-  def number: Parser[Num] = {
-    accept("number", { case n @ Num(_) => n })
+  def number: Parser[NumLiteral] = {
+    accept("number", { case n @ NumLiteral(_) => n })
   }
+
+  def bool: Parser[BoolLiteral] =
+    accept("boolean literal", { case (b: BoolLiteral) => b })
 
   def variable: Parser[Var] = {
     accept("variable", { case v @ Var(name) => v })
   }
 
   def simpleValue: Parser[SimpleValue] = {
-    number | variable
+    bool | number | variable
   }
 
   def operator: Parser[Operator] =
     accept("operator", { case (o: Operator) => o })
 
-  def mathExpr: Parser[Binop] = {
+  def mathExpr: Parser[BinopExpr] = {
     (simpleValue | bracketedExpr) ~ operator ~ expression ^^ {
       case expr1 ~ op ~ expr2 =>
-        Binop(op, expr1, expr2)
+        BinopExpr(op, expr1, expr2)
     }
   }
 

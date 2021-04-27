@@ -1,12 +1,12 @@
 import scala.util.{Try, Success, Failure}
 class TypeCheckerTest extends org.scalatest.funsuite.AnyFunSuite {
   test("can typecheck a number") {
-    assert(TypeCheck(RecordScript.parse("12")).get == (NumType, NullContext))
+    assert(RecordScript.parseAndCheck("12").get == (NumType, NullContext))
   }
 
   test("can typecheck a simple let binding") {
     assert(
-      TypeCheck(RecordScript.parse("let hello 12 hello")) == Success(
+      RecordScript.parseAndCheck("let hello 12 hello") == Success(
         NumType,
         Binding(NullContext, Var("hello"), NumType)
       )
@@ -14,9 +14,9 @@ class TypeCheckerTest extends org.scalatest.funsuite.AnyFunSuite {
   }
 
   test("can typecheck a simple addition expression") {
-    assert(TypeCheck(RecordScript.parse("112 + 20")).get._1 == NumType)
+    assert(RecordScript.parseAndCheck("112 + 20").get._1 == NumType)
     assert(
-      TypeCheck(RecordScript.parse("let hello 12 hello + hello")) == Success(
+      RecordScript.parseAndCheck("let hello 12 hello + hello") == Success(
         NumType,
         Binding(NullContext, Var("hello"), NumType)
       )
@@ -29,10 +29,17 @@ class TypeCheckerTest extends org.scalatest.funsuite.AnyFunSuite {
   }
 
   test("catches unbound variable") {
-    Try(TypeCheck(RecordScript.parse("x"))) match {
+    Try(RecordScript.parseAndCheck("x")) match {
       case Failure(exception) =>
         assert(exception.isInstanceOf[UnboundVarLookup])
       case Success(value) => fail()
     }
+  }
+
+  test("trivial boolean checks") {
+    assert(RecordScript.parseAndCheck("true").get == (BoolType, NullContext))
+    assert(
+      RecordScript.parseAndCheck("false").get == (BoolType, NullContext)
+    )
   }
 }

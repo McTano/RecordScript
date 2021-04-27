@@ -1,28 +1,31 @@
 class SExpressionTest extends org.scalatest.funsuite.AnyFunSuite {
   test("Can parse a simple value.") {
-    assert(RecordScript.parse("130") == Num(130))
+    assert(RecordScript.parse("130") == NumLiteral(130))
     assert(RecordScript.parse("x") == Var("x"))
   }
 
   test("Can parse arithmetic expressions") {
-    assert(RecordScript.parse("1 + 2") == Binop(Plus, Num(1), Num(2)))
+    assert(
+      RecordScript
+        .parse("1 + 2") == BinopExpr(Plus, NumLiteral(1), NumLiteral(2))
+    )
   }
 
   test("Can parse single let bindings") {
     assert(
       RecordScript.parse("(let x 2 x)") == LetExpr(
-        List((Var("x"), Num(2))),
+        List((Var("x"), NumLiteral(2))),
         Var("x")
       )
     )
     assert(
       RecordScript.parse("(let x 2 (let y 12 (x + y)))") == LetExpr(
-        List((Var("x"), Num(2))),
+        List((Var("x"), NumLiteral(2))),
         LetExpr(
           List(
-            (Var("y"), Num(12))
+            (Var("y"), NumLiteral(12))
           ),
-          Binop(Plus, Var("x"), Var("y"))
+          BinopExpr(Plus, Var("x"), Var("y"))
         )
       )
     )
@@ -32,20 +35,20 @@ class SExpressionTest extends org.scalatest.funsuite.AnyFunSuite {
     assert(
       RecordScript.parse("(let x 2 y 12 x)") == LetExpr(
         List(
-          (Var("x"), Num(2)),
-          (Var("y"), Num(12))
+          (Var("x"), NumLiteral(2)),
+          (Var("y"), NumLiteral(12))
         ),
         Var("x")
       )
     )
     assert(
       RecordScript.parse("(let x 2 (let y 12 (x + y)))") == LetExpr(
-        List((Var("x"), Num(2))),
+        List((Var("x"), NumLiteral(2))),
         LetExpr(
           List(
-            (Var("y"), Num(12))
+            (Var("y"), NumLiteral(12))
           ),
-          Binop(Plus, Var("x"), Var("y"))
+          BinopExpr(Plus, Var("x"), Var("y"))
         )
       )
     )

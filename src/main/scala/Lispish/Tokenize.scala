@@ -3,15 +3,23 @@ import scala.util.parsing.input._
 
 object Tokenize extends RegexParsers {
   override def skipWhitespace: Boolean = true
-  def number: Parser[Num] = """^(-?\d+)""".r ^^ { case n => Num(n.toInt) }
-  def variable: Parser[Var] = """^([a-z]\w*)""".r ^^ { case v => Var(v) }
+  def number: Parser[NumLiteral] = """^(-?\d+)""".r ^^ { case n =>
+    NumLiteral(n.toInt)
+  }
+  def variable: Parser[Var] = """^([a-z]\w*)""".r ^^ { case v =>
+    Var(v)
+  }
   def openParen: Parser[Syntax] = "(" ^^ (_ => OpenParen)
   def closeParen: Parser[Syntax] = ")" ^^ (_ => CloseParen)
   def let: Parser[Keyword] = "let" ^^ (_ => Let)
   def plus: Parser[Operator] = "+" ^^ (_ => Plus)
   def times: Parser[Operator] = "*" ^^ (_ => Star)
+  def bool: Parser[BoolLiteral] = ("true" | "false") ^^ {
+    case "true"  => True
+    case "false" => False
+  }
 
-  def keyword = (let | plus | times)
+  def keyword = (let | plus | times | bool)
 
   def syntax: Parser[Syntax] = { openParen | closeParen }
 

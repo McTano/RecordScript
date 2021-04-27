@@ -4,6 +4,7 @@ import scala.util.parsing.input._
 import scala.util.Success
 import scala.io.Source
 import java.io.File
+import scala.util.Try
 
 object RecordScript {
   val binops: Map[Operator, ((Int, Int) => Int)] =
@@ -22,7 +23,7 @@ object RecordScript {
 
   def evaluate(expression: Expression, context: Context[Int]): Int = {
     expression match {
-      case Num(n) => n
+      case NumLiteral(n) => n
       case (v: Var) =>
         context.lookup(v) match {
           case None =>
@@ -38,7 +39,7 @@ object RecordScript {
             context.extend(binder._1, evaluate(binder._2, context))
           )
         )
-      case Binop(op, lhs, rhs) =>
+      case BinopExpr(op, lhs, rhs) =>
         binops(op)(evaluate(lhs, context), evaluate(rhs, context))
       case _ =>
         throw new RuntimeException(s"expression `$expression not recognized`")
@@ -48,6 +49,15 @@ object RecordScript {
   def parse(str: String): Expression = {
     Parse(Tokenize(str))
   }
+
+  def parse(tokens: List[Token]): Expression = {
+    Parse(tokens)
+  }
+
+  def parseAndCheck(str: String): Try[(Type, Context[Type])] = {
+    TypeCheck(Parse(Tokenize(str)))
+  }
+
 }
 
 class SeqReader[T](seq: Seq[T]) extends Reader[T] {
@@ -57,27 +67,3 @@ class SeqReader[T](seq: Seq[T]) extends Reader[T] {
   def rest: SeqReader[T] = new SeqReader(seq.tail)
   override def toString = seq.toString
 }
-
-sealed trait Expression
-case class LetExpr(
-    binders: List[(Var, Expression)],
-    targetExpression: Expression
-) extends Expression
-case class Binop(o: Operator, e1: Expression, e2: Expression) extends Expression
-
-sealed trait Token
-
-sealed trait SimpleValue extends Token with Expression
-case class Num(n: Int) extends SimpleValue
-case class Var(name: String) extends SimpleValue
-
-sealed trait Syntax extends Token
-case object OpenParen extends Syntax
-case object CloseParen extends Syntax
-
-sealed trait Keyword extends Token
-case object Let extends Keyword
-
-sealed case class Operator(symbol: String, signature: Fun) extends Token
-object Plus extends Operator("+", Fun(NumType, NumType, NumType)) {}
-object Star extends Operator("*", Fun(NumType, NumType, NumType)) {}
