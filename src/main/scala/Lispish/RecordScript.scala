@@ -10,15 +10,21 @@ object RecordScript {
   val binops: Map[Operator, ((Int, Int) => Int)] =
     Map(Plus -> (_ + _), Star -> (_ * _))
 
-  def interpret(program: String): Int = {
-    evaluate(parse(program), NullContext)
+  def interpret(program: String): Try[Int] = {
+    parse(program).map(p => evaluate(p, NullContext))
   }
 
-  def interpretFile(path: String): Int = {
-    val fBuffer = Source.fromFile(new File(path))
-    val program: String = fBuffer.getLines.mkString
-    fBuffer.close
-    interpret(program)
+  def readProgram(path: String): Try[String] = {
+    Try {
+      val fBuffer = Source.fromFile(new File(path))
+      val program: String = fBuffer.getLines.mkString
+      fBuffer.close
+      program
+    }
+  }
+
+  def interpretFile(path: String): Try[Int] = {
+    readProgram(path).flatMap(interpret)
   }
 
   def evaluate(expression: Expression, context: Context[Int]): Int = {
@@ -46,16 +52,16 @@ object RecordScript {
     }
   }
 
-  def parse(str: String): Expression = {
+  def parse(str: String): Try[Expression] = {
     Parse(Tokenize(str))
   }
 
-  def parse(tokens: List[Token]): Expression = {
+  def parse(tokens: List[Token]): Try[Expression] = {
     Parse(tokens)
   }
 
   def parseAndCheck(str: String): Try[(Type, Context[Type])] = {
-    TypeCheck(Parse(Tokenize(str)))
+    Tokenize(str).flatMap(Parse.apply).flatMap(TypeCheck.apply)
   }
 
 }

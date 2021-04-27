@@ -1,8 +1,9 @@
-class RecordScriptException(message: String) extends Exception(message)
+sealed class RecordScriptException(message: String) extends Exception(message)
 
 class SyntaxError(message: String) extends RecordScriptException(message)
 
-class ParserException(message: String) extends RecordScriptException(message)
+case class ParserException(message: String)
+    extends RecordScriptException(message)
 sealed class RecordScriptTypeError(message: String)
     extends RecordScriptException(message)
 

@@ -25,15 +25,18 @@ class TypeCheckerTest extends org.scalatest.funsuite.AnyFunSuite {
   }
 
   test("fails with correct error type when rhs is not a number") {
-    // TODO when I have another type
+    assertThrows[OperatorTypeMismatch](
+      RecordScript.parseAndCheck("-1030 + false").get
+    )
+    assertThrows[OperatorTypeMismatch](
+      RecordScript.parseAndCheck("1 + true").get
+    )
   }
 
   test("catches unbound variable") {
-    Try(RecordScript.parseAndCheck("x")) match {
-      case Failure(exception) =>
-        assert(exception.isInstanceOf[UnboundVarLookup])
-      case Success(value) => fail()
-    }
+    assertThrows[UnboundVarLookup](RecordScript.parseAndCheck("x").get)
+    assertThrows[UnboundVarLookup](RecordScript.parseAndCheck("x + 1").get)
+    assertThrows[UnboundVarLookup](RecordScript.parseAndCheck("12 * x").get)
   }
 
   test("trivial boolean checks") {

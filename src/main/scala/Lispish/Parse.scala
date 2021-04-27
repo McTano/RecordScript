@@ -2,10 +2,11 @@ import util.matching.Regex
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 import scala.util.Success
+import scala.util.Try
 object Parse extends PackratParsers {
   type Elem = Token
   def number: Parser[NumLiteral] = {
-    accept("number", { case n @ NumLiteral(_) => n })
+    accept("number", { case (n: NumLiteral) => n })
   }
 
   def bool: Parser[BoolLiteral] =
@@ -58,14 +59,18 @@ object Parse extends PackratParsers {
     phrase(expression)
   }
 
-  def apply(tokens: List[Token]): Expression = {
+  def apply(tokens: List[Token]): Try[Expression] = {
     val reader = new SeqReader(tokens)
     program(reader) match {
-      case Success(result, next) => result
-      case Failure(msg, next) =>
-        throw new ParserException(s"parsing failed on $tokens, \n$msg \n$next")
-      case Error(msg, next) =>
-        throw new ParserException(s"parsing failed on $tokens, \n$msg \n$next")
+      case Success(result, next) => scala.util.Success(result)
+      case NoSuccess(msg, next) =>
+        scala.util.Failure(
+          ParserException(s"parsing failed on $tokens, \n$msg \n$next")
+        )
     }
+  }
+
+  def apply(tokens: Try[List[Token]]): Try[Expression] = {
+    tokens.flatMap(apply)
   }
 }

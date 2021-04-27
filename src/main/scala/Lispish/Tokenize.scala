@@ -1,5 +1,6 @@
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
+import scala.util.Try
 
 object Tokenize extends RegexParsers {
   override def skipWhitespace: Boolean = true
@@ -26,12 +27,12 @@ object Tokenize extends RegexParsers {
   def token: Parser[Token] = { syntax | keyword | number | variable }
   def tokens: Parser[List[Token]] = { phrase(rep1(token)) }
 
-  def apply(program: String): List[Token] = {
+  def apply(program: String): Try[List[Token]] = {
     val reader = new CharSequenceReader(program)
     parse(tokens, reader) match {
-      case Success(result, next) => result
+      case Success(result, next) => scala.util.Success(result)
       case NoSuccess(msg, _) =>
-        throw new ParserException(msg)
+        scala.util.Failure(new ParserException(msg))
     }
   }
 }
