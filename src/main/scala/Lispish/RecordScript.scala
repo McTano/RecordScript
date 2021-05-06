@@ -52,6 +52,7 @@ object RecordScript {
     }
   }
 
+  // Combines the Tokenize and Parse steps
   def parse(str: String): Try[Expression] = {
     Parse(Tokenize(str))
   }

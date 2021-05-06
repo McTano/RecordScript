@@ -11,6 +11,7 @@ sealed trait Token
 sealed trait SimpleValue extends Token with Expression
 case class NumLiteral(n: Double) extends SimpleValue
 case class Var(name: String) extends SimpleValue
+case class StringLiteral(chars: String) extends SimpleValue
 // also Bool literals, see below.
 
 sealed trait Keyword extends Token

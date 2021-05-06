@@ -3,6 +3,9 @@ import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 import scala.util.Success
 import scala.util.Try
+
+// Parse consumes t Parser[Token] = { syntax | keyword | string | number | variable }he output of Tokenize
+
 object Parse extends PackratParsers {
   type Elem = Token
   def number: Parser[NumLiteral] = {
@@ -16,8 +19,11 @@ object Parse extends PackratParsers {
     accept("variable", { case v @ Var(name) => v })
   }
 
+  def stringLiteral: Parser[StringLiteral] =
+    accept("string literal", { case s @ StringLiteral(chars) => s })
+
   def simpleValue: Parser[SimpleValue] = {
-    bool | number | variable
+    bool | number | variable | stringLiteral
   }
 
   def operator: Parser[Operator] =
@@ -70,7 +76,7 @@ object Parse extends PackratParsers {
     }
   }
 
-  def apply(tokens: Try[List[Token]]): Try[Expression] = {
+  def apply(tokens: scala.util.Try[List[Token]]): Try[Expression] = {
     tokens.flatMap(apply)
   }
 }

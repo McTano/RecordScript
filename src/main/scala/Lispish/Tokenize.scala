@@ -1,15 +1,25 @@
 import scala.util.parsing.combinator._
 import scala.util.parsing.input._
 import scala.util.Try
-
 object Tokenize extends RegexParsers {
+
+  def EofCh = CharArrayReader.EofCh
+
   override def skipWhitespace: Boolean = true
-  def number: Parser[NumLiteral] = """-?\d+(\.\d*)?""".r ^^ { case n =>
-    NumLiteral(n.toDouble)
+  def number: Parser[NumLiteral] = """-?\d+(\.\d*)?""".r ^^ { case nstr =>
+    NumLiteral(nstr.toDouble)
   }
-  def variable: Parser[Var] = """^([a-z]\w*)""".r ^^ { case v =>
-    Var(v)
+
+  def variable: Parser[Var] = """^([a-z]\w*)""".r ^^ {
+    Var(_)
   }
+
+  def string: Parser[StringLiteral] = (""""(.*?)(?<!\\)"""".r ^^ {
+    case s""""${contents}"""" => StringLiteral(contents)
+  }) | ("""'(.*?)(?<!\\)'""".r ^^ { case s"""'${contents}'""" =>
+    StringLiteral(contents)
+  })
+
   def openParen: Parser[Syntax] = "(" ^^ (_ => OpenParen)
   def closeParen: Parser[Syntax] = ")" ^^ (_ => CloseParen)
   def let: Parser[Keyword] = "let" ^^ (_ => Let)
@@ -20,11 +30,15 @@ object Tokenize extends RegexParsers {
     case "false" => False
   }
 
-  def keyword = (let | plus | times | bool)
+  def operator: Parser[Operator] = plus | times
+
+  def keyword: Parser[Keyword] = (let | bool)
 
   def syntax: Parser[Syntax] = { openParen | closeParen }
 
-  def token: Parser[Token] = { syntax | keyword | number | variable }
+  def token: Parser[Token] = {
+    syntax | keyword | operator | string | number | variable
+  }
   def tokens: Parser[List[Token]] = { phrase(rep1(token)) }
 
   def apply(program: String): Try[List[Token]] = {

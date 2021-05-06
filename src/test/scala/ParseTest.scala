@@ -1,4 +1,4 @@
-class SExpressionTest extends org.scalatest.funsuite.AnyFunSuite {
+class ParseTest extends org.scalatest.funsuite.AnyFunSuite {
   test("Can parse a simple value.") {
     assert(RecordScript.parse("130").get == NumLiteral(130))
     assert(RecordScript.parse("x").get == Var("x"))
@@ -55,48 +55,44 @@ class SExpressionTest extends org.scalatest.funsuite.AnyFunSuite {
     )
   }
 
-  test("get addition and multiplication right") {
-    assert(RecordScript.interpret("(7 + 13)").get == 20)
-    assert(RecordScript.interpret("(7 * 13)").get == 91)
-  }
-
-  test("Evaluates simple expressions correctly") {
-    assert(RecordScript.interpret("(1 + 2)").get == 3)
-    assert(RecordScript.interpret("((let x 3 x) * 12)").get == 36)
-
-  }
-  test("handles nested let bindings correctly") {
+  test("Can parse single-quoted string") {
+    assert(RecordScript.parse(""""hello"""").get == StringLiteral("hello"))
+    assert(RecordScript.parse("""("hello")""").get == StringLiteral("hello"))
     assert(
-      RecordScript
-        .interpret(
-          "(let x 7 ((let x 30 x) + 1700))"
-        )
-        .get == 1730
+      RecordScript.parse("""("(goodbye)")""").get == StringLiteral("(goodbye)")
     )
   }
 
-  test("handles multiple bindings in let") {
+  test("Can parse double quoted string") {
     assert(
       RecordScript
-        .interpret(
-          "(let x 7 y 13 ((let y 30 x 1700 (x + y)) + y))"
-        )
-        .get == 1743
+        .parse("'a string can use single quotes'")
+        .get == StringLiteral(
+        "a string can use single quotes"
+      )
     )
   }
 
-  test("can interpret a file") {
+  test("single quotes inside double quotes") {
+    assert(
+      RecordScript.parse("""("it's okay")""").get == StringLiteral("it's okay")
+    )
     assert(
       RecordScript
-        .interpretFile(
-          "src/test/scala/examples/simpleProgram.sexp"
-        )
-        .get == 1743
+        .parse("""("works when 'single quotes' are paired")""")
+        .get == StringLiteral("works when 'single quotes' are paired")
     )
   }
 
-  test("extra parens are okay") {
-    assert(RecordScript.interpret("(((1)))").get == 1)
-  }
+  // test("escaped quotes inside quotes") {
+  //   // this test passes, but the escaping isn't working quite right. Looks like the backslashes are getting preserved.
+  //   assert(
+  //     RecordScript
+  //       .parse("""
+  //   "don't fail on a \"quote unquote \" \"nested quote\""
+  //   """).get
+  //       == StringLiteral("don't fail on a \"quote unquote\" \"nested \"quote")
+  //   )
+  // }
 
 }
