@@ -9,7 +9,7 @@ case class BinopExpr(o: Operator, e1: Expression, e2: Expression)
 sealed trait Token
 
 sealed trait SimpleValue extends Token with Expression
-case class NumLiteral(n: Int) extends SimpleValue
+case class NumLiteral(n: Double) extends SimpleValue
 case class Var(name: String) extends SimpleValue
 // also Bool literals, see below.
 

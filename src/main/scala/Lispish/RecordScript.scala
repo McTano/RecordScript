@@ -7,10 +7,10 @@ import java.io.File
 import scala.util.Try
 
 object RecordScript {
-  val binops: Map[Operator, ((Int, Int) => Int)] =
+  val binops: Map[Operator, ((Double, Double) => Double)] =
     Map(Plus -> (_ + _), Star -> (_ * _))
 
-  def interpret(program: String): Try[Int] = {
+  def interpret(program: String): Try[Double] = {
     parse(program).map(p => evaluate(p, NullContext))
   }
 
@@ -23,11 +23,11 @@ object RecordScript {
     }
   }
 
-  def interpretFile(path: String): Try[Int] = {
+  def interpretFile(path: String): Try[Double] = {
     readProgram(path).flatMap(interpret)
   }
 
-  def evaluate(expression: Expression, context: Context[Int]): Int = {
+  def evaluate(expression: Expression, context: Context[Double]): Double = {
     expression match {
       case NumLiteral(n) => n
       case (v: Var) =>

@@ -4,8 +4,8 @@ import scala.util.Try
 
 object Tokenize extends RegexParsers {
   override def skipWhitespace: Boolean = true
-  def number: Parser[NumLiteral] = """^(-?\d+)""".r ^^ { case n =>
-    NumLiteral(n.toInt)
+  def number: Parser[NumLiteral] = """-?\d+(\.\d*)?""".r ^^ { case n =>
+    NumLiteral(n.toDouble)
   }
   def variable: Parser[Var] = """^([a-z]\w*)""".r ^^ { case v =>
     Var(v)
