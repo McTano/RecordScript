@@ -25,6 +25,15 @@ sealed trait Syntax extends Token
 case object OpenParen extends Syntax
 case object CloseParen extends Syntax
 
+case object OpenBrace extends Syntax
+case object CloseBrace extends Syntax
+
+case object OpenBracket extends Syntax
+case object CloseBracket extends Syntax
+
+case object SemiColon extends Syntax
+case object Comma extends Syntax
+
 sealed case class Operator(symbol: String, signature: BinopType) extends Token
 object Plus extends Operator("+", BinopType(NumType, NumType, NumType)) {}
 object Star extends Operator("*", BinopType(NumType, NumType, NumType)) {}
